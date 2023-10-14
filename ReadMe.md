@@ -8,3 +8,8 @@ Other model formats can be made into Modeling Toolking objects. If they are load
 This was made in order to make it easier porting models between older games. The main issue being that converting a quaternion rotation to XYZ euler rotation most often than not leads to errors.
 
 ![](Showcase.png)
+
+Dependencies:
+* AssimpNet - 5.0.0 beta version. Other versions won't work
+* HelixToolkit.Wpf - For 3D viewport utilities
+* System.Drawing.Common - For bitmap images
