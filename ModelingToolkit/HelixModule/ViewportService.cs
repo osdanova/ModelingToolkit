@@ -111,7 +111,7 @@ namespace ModelingToolkit.HelixModule
 
         public void ResetCamera()
         {
-            if(Models.Count > 0)
+            if(Models.Count > 0 && Models[0].Meshes.Count > 0)
             {
                 Rect3D boundingBox = Models[0].GetBoundingBox();
                 double greatestSize = (boundingBox.SizeY > boundingBox.SizeZ) ? boundingBox.SizeY : boundingBox.SizeZ;
