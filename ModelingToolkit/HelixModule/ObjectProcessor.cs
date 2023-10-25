@@ -93,8 +93,9 @@ namespace ModelingToolkit.HelixModule
         public static List<LinesVisual3D> GetWireframeFromModel(MtModel model)
         {
             List<LinesVisual3D> wireframe = new List<LinesVisual3D>();
-            foreach (MtMesh mesh in model.Meshes)
+            for(int i = 0; i < model.Meshes.Count; i++)
             {
+                MtMesh mesh = model.Meshes[i];
                 if (mesh.IsVisible && mesh.IsWireframeVisible)
                 {
                     wireframe.AddRange(GetWireframeFromMesh(mesh));
@@ -107,8 +108,9 @@ namespace ModelingToolkit.HelixModule
         public static List<LinesVisual3D> GetWireframeFromMesh(MtMesh mesh)
         {
             List<LinesVisual3D> wireframe = new List<LinesVisual3D>();
-            foreach (MtFace face in mesh.Faces)
+            for(int i = 0; i < mesh.Faces.Count; i++)
             {
+                MtFace face = mesh.Faces[i];
                 List<Vector3> vertexPositions = new List<Vector3>();
                 foreach (int vertexIndex in face.VertexIndices)
                 {
@@ -118,6 +120,8 @@ namespace ModelingToolkit.HelixModule
                 LinesVisual3D line = new LinesVisual3D();
                 line.Points.Add(new Point3D(vertexPositions[0].X, vertexPositions[0].Y, vertexPositions[0].Z));
                 line.Points.Add(new Point3D(vertexPositions[1].X, vertexPositions[1].Y, vertexPositions[1].Z));
+                line.Points.Add(new Point3D(vertexPositions[1].X, vertexPositions[1].Y, vertexPositions[1].Z));
+                line.Points.Add(new Point3D(vertexPositions[2].X, vertexPositions[2].Y, vertexPositions[2].Z));
                 line.Points.Add(new Point3D(vertexPositions[2].X, vertexPositions[2].Y, vertexPositions[2].Z));
                 line.Points.Add(new Point3D(vertexPositions[0].X, vertexPositions[0].Y, vertexPositions[0].Z));
                 line.Color = Colors.Blue;
@@ -137,8 +141,7 @@ namespace ModelingToolkit.HelixModule
             for (int i = 0; i < model.Joints.Count; i++)
             {
                 MtJoint joint = model.Joints[i];
-                if (joint.ParentId == null)
-                {
+                if (!joint.IsVisible || joint.ParentId == null) {
                     continue;
                 }
 
@@ -161,6 +164,10 @@ namespace ModelingToolkit.HelixModule
             for (int i = 0; i < model.Joints.Count; i++)
             {
                 MtJoint joint = model.Joints[i];
+
+                if (!joint.IsVisible) {
+                    continue;
+                }
 
                 RectangleVisual3D rectVis = new RectangleVisual3D
                 {

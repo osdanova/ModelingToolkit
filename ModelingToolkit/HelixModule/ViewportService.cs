@@ -40,8 +40,12 @@ namespace ModelingToolkit.HelixModule
 
         public void LoadNewModel(MtModel model)
         {
+            LoadNewModels(new List<MtModel> { model });
+        }
+        public void LoadNewModels(List<MtModel> models)
+        {
             Models.Clear();
-            Models.Add(model);
+            Models.AddRange(models);
             Render();
             ResetCamera();
         }
@@ -115,7 +119,7 @@ namespace ModelingToolkit.HelixModule
             {
                 Rect3D boundingBox = Models[0].GetBoundingBox();
                 double greatestSize = (boundingBox.SizeY > boundingBox.SizeZ) ? boundingBox.SizeY : boundingBox.SizeZ;
-                Viewport.CameraController.CameraPosition = new Point3D(boundingBox.X + greatestSize * 5, boundingBox.Z, boundingBox.Y);
+                Viewport.CameraController.CameraPosition = new Point3D(boundingBox.X + greatestSize * 3, boundingBox.Z, boundingBox.Y);
                 Viewport.CameraController.CameraTarget = new Point3D(boundingBox.X, boundingBox.Z, boundingBox.Y);
                 Viewport.CameraController.CameraUpDirection = new Vector3D(0, 0, 1);
             }

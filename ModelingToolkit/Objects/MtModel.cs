@@ -81,6 +81,23 @@ namespace ModelingToolkit.Objects
             }
         }
 
+        public void BuildBoneDataFromRelativeMatrices()
+        {
+            for (int i = 0; i < Joints.Count; i++)
+            {
+                MtJoint joint = Joints[i];
+                if(joint.ParentId == null)
+                {
+                    joint.AbsoluteTransformationMatrix = joint.RelativeTransformationMatrix;
+                }
+                else
+                {
+                    joint.AbsoluteTransformationMatrix = joint.RelativeTransformationMatrix * Joints[joint.ParentId.Value].AbsoluteTransformationMatrix;
+                }
+                joint.Decompose();
+            }
+        }
+
         public Rect3D GetBoundingBox()
         {
             float minX = 0;
