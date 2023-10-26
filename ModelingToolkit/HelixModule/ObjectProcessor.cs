@@ -64,10 +64,17 @@ namespace ModelingToolkit.HelixModule
                 DiffuseMaterial myMaterial = Visuals.GetDefaultMaterial();
                 try
                 {
-                    myMaterial = new DiffuseMaterial
+                    if(model.Materials[mesh.MaterialId.Value].DiffuseTextureBitmap != null)
                     {
-                        Brush = new ImageBrush(model.Materials[mesh.MaterialId.Value].GetAsBitmapImage()),
-                    };
+                        myMaterial = new DiffuseMaterial
+                        {
+                            Brush = new ImageBrush(model.Materials[mesh.MaterialId.Value].GetAsBitmapImage()),
+                        };
+                    }
+                    else
+                    {
+                        myMaterial = Visuals.GetDefaultMaterial();
+                    }
                 }
                 catch (Exception e)
                 {
