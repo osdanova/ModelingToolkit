@@ -77,8 +77,8 @@ namespace ModelingToolkit.Objects
                     Matrix4x4 rotationMatrixX = Matrix4x4.CreateRotationX(((Vector3)AbsoluteRotation).X);
                     Matrix4x4 rotationMatrixY = Matrix4x4.CreateRotationY(((Vector3)AbsoluteRotation).Y);
                     Matrix4x4 rotationMatrixZ = Matrix4x4.CreateRotationZ(((Vector3)AbsoluteRotation).Z);
-                    //rotationMatrix = rotationMatrixX * rotationMatrixY * rotationMatrixZ;
-                    rotationMatrix = rotationMatrixZ * rotationMatrixY * rotationMatrixX;
+                    rotationMatrix = rotationMatrixX * rotationMatrixY * rotationMatrixZ;
+                    //rotationMatrix = rotationMatrixZ * rotationMatrixY * rotationMatrixX;
                 }
                 Matrix4x4 translationMatrix = Matrix4x4.CreateTranslation((Vector3)AbsoluteTranslation);
 
@@ -98,8 +98,8 @@ namespace ModelingToolkit.Objects
                     Matrix4x4 rotationMatrixX = Matrix4x4.CreateRotationX(((Vector3)RelativeRotation).X);
                     Matrix4x4 rotationMatrixY = Matrix4x4.CreateRotationY(((Vector3)RelativeRotation).Y);
                     Matrix4x4 rotationMatrixZ = Matrix4x4.CreateRotationZ(((Vector3)RelativeRotation).Z);
-                    //rotationMatrix = rotationMatrixX * rotationMatrixY * rotationMatrixZ;
-                    rotationMatrix = rotationMatrixZ * rotationMatrixY * rotationMatrixX;
+                    rotationMatrix = rotationMatrixX * rotationMatrixY * rotationMatrixZ;
+                    //rotationMatrix = rotationMatrixZ * rotationMatrixY * rotationMatrixX;
                 }
                 Matrix4x4 translationMatrix = Matrix4x4.CreateTranslation((Vector3)RelativeTranslation);
 
