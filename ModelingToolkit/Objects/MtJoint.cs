@@ -45,20 +45,24 @@ namespace ModelingToolkit.Objects
         {
             if (AbsoluteTransformationMatrix != null)
             {
-                Matrix4x4.Decompose((Matrix4x4)AbsoluteTransformationMatrix, out Vector3 scale, out Quaternion rotation, out Vector3 translation);
-                AbsoluteScale = scale;
-                AbsoluteRotationQ = rotation;
-                AbsoluteTranslation = translation;
-                AbsoluteRotation = ToEulerAngles(AbsoluteRotationQ.Value);
+                Matrix4x4.Decompose((Matrix4x4)AbsoluteTransformationMatrix, out Vector3 scaleQ, out Quaternion rotationQ, out Vector3 translationQ);
+                AbsoluteScale = scaleQ;
+                AbsoluteRotationQ = rotationQ;
+                AbsoluteTranslation = translationQ;
+
+                DecomposeEuler((Matrix4x4)AbsoluteTransformationMatrix, out Vector3 scale, out Vector3 rotation, out Vector3 translation);
+                AbsoluteRotation = rotation;
             }
 
             if (RelativeTransformationMatrix != null)
             {
-                Matrix4x4.Decompose((Matrix4x4)RelativeTransformationMatrix, out Vector3 scale, out Quaternion rotation, out Vector3 translation);
-                RelativeScale = scale;
-                RelativeRotationQ = rotation;
-                RelativeTranslation = translation;
-                RelativeRotation = ToEulerAngles(RelativeRotationQ.Value);
+                Matrix4x4.Decompose((Matrix4x4)RelativeTransformationMatrix, out Vector3 scaleQ, out Quaternion rotationQ, out Vector3 translationQ);
+                RelativeScale = scaleQ;
+                RelativeRotationQ = rotationQ;
+                RelativeTranslation = translationQ;
+
+                DecomposeEuler((Matrix4x4)RelativeTransformationMatrix, out Vector3 scale, out Vector3 rotation, out Vector3 translation);
+                AbsoluteRotation = rotation;
             }
         }
 
@@ -107,28 +111,57 @@ namespace ModelingToolkit.Objects
             }
         }
 
-        // VVV Attempts to get euler angles (in radians) from the quaternion rotations VVV
-
-        // From ChatGPT
-        public static Vector3 ToEulerAnglesXYZ(Quaternion quaternion)
+        // From Assimp library
+        public static void DecomposeEuler(Matrix4x4 matrix, out Vector3 scale, out Vector3 rotation, out Vector3 position)
         {
-            // Extract the individual components of the quaternion
-            float qx = quaternion.X;
-            float qy = quaternion.Y;
-            float qz = quaternion.Z;
-            float qw = quaternion.W;
+            // Extract the translation
+            position = new Vector3(matrix.M41, matrix.M42, matrix.M43);
 
-            // Calculate the roll (X-axis rotation)
-            float roll = (float)Math.Atan2(2 * (qx * qw + qy * qz), 1 - 2 * (qx * qx + qy * qy));
+            // Extract the scale
+            scale = new Vector3(
+                new Vector3(matrix.M11, matrix.M12, matrix.M13).Length(),
+                new Vector3(matrix.M21, matrix.M22, matrix.M23).Length(),
+                new Vector3(matrix.M31, matrix.M32, matrix.M33).Length()
+            );
 
-            // Calculate the pitch (Y-axis rotation)
-            float pitch = (float)Math.Asin(2 * (qw * qy - qx * qz));
+            // Remove scale from the matrix to isolate the rotation
+            Matrix4x4 rotationMatrix = new Matrix4x4(
+                matrix.M11 / scale.X, matrix.M12 / scale.X, matrix.M13 / scale.X, 0.0f,
+                matrix.M21 / scale.Y, matrix.M22 / scale.Y, matrix.M23 / scale.Y, 0.0f,
+                matrix.M31 / scale.Z, matrix.M32 / scale.Z, matrix.M33 / scale.Z, 0.0f,
+                0.0f, 0.0f, 0.0f, 1.0f
+            );
 
-            // Calculate the yaw (Z-axis rotation)
-            float yaw = (float)Math.Atan2(2 * (qx * qy + qz * qw), 1 - 2 * (qy * qy + qz * qz));
+            // Use a small epsilon to solve floating-point inaccuracies
+            const float epsilon = 1e-6f;
 
-            // Return the Euler angles as a Vector3 (roll, pitch, yaw)
-            return new Vector3(roll, pitch, yaw);
+            // Extract the rotation angles from the rotation matrix
+            rotation.Y = (float)Math.Asin(-rotationMatrix.M13); // Angle around Y
+
+            float cosY = (float)Math.Cos(rotation.Y);
+
+            if (Math.Abs(cosY) > epsilon)
+            {
+                // Finding angle around X
+                float tanX = rotationMatrix.M33 / cosY; // A
+                float tanY = rotationMatrix.M23 / cosY; // B
+                rotation.X = (float)Math.Atan2(tanY, tanX);
+
+                // Finding angle around Z
+                tanX = rotationMatrix.M11 / cosY; // E
+                tanY = rotationMatrix.M12 / cosY; // F
+                rotation.Z = (float)Math.Atan2(tanY, tanX);
+            }
+            else
+            {
+                // Y is fixed
+                rotation.X = 0;
+
+                // Finding angle around Z
+                float tanX = rotationMatrix.M22; // E
+                float tanY = -rotationMatrix.M21; // F
+                rotation.Z = (float)Math.Atan2(tanY, tanX);
+            }
         }
 
         /// From https://stackoverflow.com/a/70462919
@@ -158,39 +191,6 @@ namespace ModelingToolkit.Objects
             angles.Z = (float)Math.Atan2(siny_cosp, cosy_cosp);
 
             return angles;
-        }
-
-        // From ChatGPT based on http://eecs.qmul.ac.uk/~gslabaugh/publications/euler.pdf
-        public static Vector3 ExtractEulerAnglesXYZ(Quaternion q)
-        {
-            Matrix4x4 matrix = Matrix4x4.CreateFromQuaternion(q);
-
-            // Extract Euler angles (roll, pitch, yaw) from a rotation matrix
-            float roll, pitch, yaw;
-
-            // Extract pitch (around X-axis)
-            pitch = (float)Math.Asin(-matrix.M23);
-
-            // Check for special cases to avoid gimbal lock
-            if (Math.Abs(matrix.M23) < 0.99999)
-            {
-                // Extract yaw (around Y-axis)
-                yaw = (float)Math.Atan2(matrix.M13, matrix.M33);
-
-                // Extract roll (around Z-axis)
-                roll = (float)Math.Atan2(matrix.M21, matrix.M22);
-            }
-            else
-            {
-                // Gimbal lock: pitch is near +/-90 degrees
-                // Extract yaw (around Y-axis)
-                yaw = (float)Math.Atan2(-matrix.M31, matrix.M11);
-
-                // Roll is not well-defined in gimbal lock, so set it to zero
-                roll = 0;
-            }
-
-            return new Vector3(roll, pitch, yaw);
         }
     }
 }
