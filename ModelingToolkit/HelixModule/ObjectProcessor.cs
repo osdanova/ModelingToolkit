@@ -36,7 +36,15 @@ namespace ModelingToolkit.HelixModule
                 foreach (MtVertex vertex in mesh.Vertices)
                 {
                     myPositionCollection.Add(new Point3D(vertex.AbsolutePosition.Value.X, vertex.AbsolutePosition.Value.Y, vertex.AbsolutePosition.Value.Z));
-                    myTextureCoordinatesCollection.Add(new System.Windows.Point(vertex.TextureCoordinates.Value.X, 1f - vertex.TextureCoordinates.Value.Y));
+                    float x = vertex.TextureCoordinates.Value.X;
+                    float y = 1f - vertex.TextureCoordinates.Value.Y;
+                    if (x < 0 || x > 1) {
+                        x = x - (int)x;
+                    }
+                    if (y < 0 || y > 1) {
+                        y = y - (int)y;
+                    }
+                    myTextureCoordinatesCollection.Add(new System.Windows.Point(x, y));
                 }
 
                 foreach (MtFace face in mesh.Faces)
