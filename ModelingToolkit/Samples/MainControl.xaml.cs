@@ -9,18 +9,18 @@ namespace ModelingToolkit.Samples
 {
     public partial class MainControl : UserControl
     {
-        public ViewportService VpService { get; set; }
+        public ViewportController VpController { get; set; }
         public string LoadedFile { get; set; }
         public MtModel LoadedModel { get; set; }
         public MainControl()
         {
             InitializeComponent();
-            VpService = new ViewportService(HelixViewport);
-            VpService.ShowMesh = true;
-            VpService.ShowWireframe = true;
-            VpService.ShowSkeleton = true;
-            VpService.ShowJoints = true;
-            VpService.ShowBoundingBox = true;
+            VpController = new ViewportController(HelixViewport);
+            VpController.ShowMesh = true;
+            VpController.ShowWireframe = true;
+            VpController.ShowSkeleton = true;
+            VpController.ShowJoints = true;
+            VpController.ShowBoundingBox = true;
         }
 
         private void Grid_Drop(object sender, DragEventArgs e)
@@ -41,33 +41,33 @@ namespace ModelingToolkit.Samples
         public void loadFile()
         {
             LoadedModel = AssimpImporter.ImportScene(LoadedFile);
-            VpService.LoadNewModel(LoadedModel);
+            VpController.LoadNewModel(LoadedModel);
         }
 
         private void Button_Mesh(object sender, RoutedEventArgs e)
         {
-            VpService.ShowMesh = !VpService.ShowMesh;
-            VpService.Render();
+            VpController.ShowMesh = !VpController.ShowMesh;
+            VpController.Render();
         }
         private void Button_Wireframe(object sender, RoutedEventArgs e)
         {
-            VpService.ShowWireframe = !VpService.ShowWireframe;
-            VpService.Render();
+            VpController.ShowWireframe = !VpController.ShowWireframe;
+            VpController.Render();
         }
         private void Button_skeleton(object sender, RoutedEventArgs e)
         {
-            VpService.ShowSkeleton = !VpService.ShowSkeleton;
-            VpService.Render();
+            VpController.ShowSkeleton = !VpController.ShowSkeleton;
+            VpController.Render();
         }
         private void Button_joints(object sender, RoutedEventArgs e)
         {
-            VpService.ShowJoints = !VpService.ShowJoints;
-            VpService.Render();
+            VpController.ShowJoints = !VpController.ShowJoints;
+            VpController.Render();
         }
         private void Button_boundingBox(object sender, RoutedEventArgs e)
         {
-            VpService.ShowBoundingBox = !VpService.ShowBoundingBox;
-            VpService.Render();
+            VpController.ShowBoundingBox = !VpController.ShowBoundingBox;
+            VpController.Render();
         }
         private void Button_reload(object sender, RoutedEventArgs e)
         {

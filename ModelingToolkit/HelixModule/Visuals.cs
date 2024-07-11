@@ -70,6 +70,20 @@ namespace ModelingToolkit.HelixModule
             };
         }
 
+        public static TubeVisual3D GetColumnVisual(Vector3 position, float height, float width, Color? color = null)
+        {
+            Point3DCollection points = new Point3DCollection();
+            points.Add(new Point3D(position.X, position.Y, position.Z + height / 2));
+            points.Add(new Point3D(position.X, position.Y, position.Z - height / 2));
+            return new TubeVisual3D
+            {
+                Path = points,
+                Diameter = width,
+                AddCaps = true,
+                Material = (color == null) ? GetDefaultMaterial() : new DiffuseMaterial(new SolidColorBrush(color.Value))
+            };
+        }
+
         public static EllipsoidVisual3D GetEllipsoidVisual(Vector3 position, float height, float width, float depth, Color? color = null)
         {
             return new EllipsoidVisual3D
