@@ -90,8 +90,8 @@ namespace ModelingToolkit.HelixModule
             {
                 Center = new Point3D(position.X, position.Y, position.Z),
                 RadiusX= width,
-                RadiusY= height,
-                RadiusZ= depth,
+                RadiusY= depth,
+                RadiusZ= height,
                 Material = (color == null) ? GetDefaultMaterial() : new DiffuseMaterial(new SolidColorBrush(color.Value))
             };
         }
