@@ -16,11 +16,6 @@ namespace ModelingToolkit.Samples
         {
             InitializeComponent();
             VpController = new ViewportController(HelixViewport);
-            VpController.ShowMesh = true;
-            VpController.ShowWireframe = true;
-            VpController.ShowSkeleton = true;
-            VpController.ShowJoints = true;
-            VpController.ShowBoundingBox = true;
         }
 
         private void Grid_Drop(object sender, DragEventArgs e)
@@ -41,32 +36,35 @@ namespace ModelingToolkit.Samples
         public void loadFile()
         {
             LoadedModel = AssimpImporter.ImportScene(LoadedFile);
-            VpController.LoadNewModel(LoadedModel);
+            VpController.ClearModels();
+            VpController.ClearShapes();
+            VpController.AddModel(LoadedModel);
+            VpController.Render();
         }
 
         private void Button_Mesh(object sender, RoutedEventArgs e)
         {
-            VpController.ShowMesh = !VpController.ShowMesh;
+            VpController.SetVisibilityMesh(!VpController.IsMeshVisible);
             VpController.Render();
         }
         private void Button_Wireframe(object sender, RoutedEventArgs e)
         {
-            VpController.ShowWireframe = !VpController.ShowWireframe;
+            VpController.SetVisibilityWireframe(!VpController.IsWireframeVisible);
             VpController.Render();
         }
         private void Button_skeleton(object sender, RoutedEventArgs e)
         {
-            VpController.ShowSkeleton = !VpController.ShowSkeleton;
+            VpController.SetVisibilitySkeleton(!VpController.IsSkeletonVisible);
             VpController.Render();
         }
         private void Button_joints(object sender, RoutedEventArgs e)
         {
-            VpController.ShowJoints = !VpController.ShowJoints;
+            VpController.SetVisibilityJoint(!VpController.IsJointVisible);
             VpController.Render();
         }
         private void Button_boundingBox(object sender, RoutedEventArgs e)
         {
-            VpController.ShowBoundingBox = !VpController.ShowBoundingBox;
+            VpController.SetVisibilityBoundingBox(!VpController.IsBoundingBoxVisible);
             VpController.Render();
         }
         private void Button_reload(object sender, RoutedEventArgs e)
