@@ -93,35 +93,41 @@ namespace ModelingToolkit.Objects
             return Color.FromArgb(alpha, red, green, blue);
         }
 
-        public void BitmapToDataClut()
+        public void BitmapToDataClut(int clutSize = 256)
         {
             Data = new byte[Width * Height];
             List<int> clutList = new List<int>();
+            clutList.Add(0); // No color
 
-            for(int x = 0; x < Width; x++)
+            for (int y = 0; y < Height; y++)
             {
-                for (int y = 0; y < Height; y++)
+                for (int x = 0; x < Width; x++)
                 {
-                    Color pixelColor = DiffuseTextureBitmap.GetPixel(x,y);
+                    Color pixelColor = DiffuseTextureBitmap.GetPixel(x, y);
                     int intColor = pixelColor.ToArgb();
-                    byte colorIndex = (byte)clutList.IndexOf(intColor);
-                    if(colorIndex == -1)
+                    int colorIndexInt = clutList.IndexOf(intColor);
+                    if (colorIndexInt == -1)
                     {
-                        if(clutList.Count == 256) {
-                            throw new Exception("The image has more than 256 colors");
+                        if (clutList.Count == clutSize)
+                        {
+                            throw new Exception("The image has more than " + clutSize + " colors");
                         }
 
-                        colorIndex = (byte)clutList.Count;
-                        clutList.Add(colorIndex);
+                        colorIndexInt = (byte)clutList.Count;
+                        clutList.Add(intColor);
                     }
-                    Data[Width * x + Height * y] = colorIndex;
+                    Data[(Width * y) + x] = (byte)colorIndexInt;
                 }
             }
 
-            Clut = new byte[256];
+            Clut = new byte[clutSize * 4];
             for(int i = 0; i < clutList.Count; i++)
             {
-                Clut[i] = (byte)clutList[i];
+                byte[] argbBytes = BitConverter.GetBytes(clutList[i]);
+                Clut[4 * i] = argbBytes[2];
+                Clut[4 * i + 1] = argbBytes[1];
+                Clut[4 * i + 2] = argbBytes[0];
+                Clut[4 * i + 3] = argbBytes[3];
             }
         }
 

@@ -40,7 +40,7 @@ namespace ModelingToolkit.HelixModule
             return line;
         }
 
-        
+
         public static BoundingBoxWireFrameVisual3D GetBoundingBoxVisual(double positionX, double positionY, double positionZ, double sizeX, double sizeY, double sizeZ, Color? color = null, float thickness = 1)
         {
             return GetBoundingBoxVisual(new Rect3D(positionX, positionY, positionZ, sizeX, sizeY, sizeZ), color, thickness);
@@ -89,9 +89,9 @@ namespace ModelingToolkit.HelixModule
             return new EllipsoidVisual3D
             {
                 Center = new Point3D(position.X, position.Y, position.Z),
-                RadiusX= width,
-                RadiusY= depth,
-                RadiusZ= height,
+                RadiusX = width,
+                RadiusY = depth,
+                RadiusZ = height,
                 Material = (color == null) ? GetDefaultMaterial() : new DiffuseMaterial(new SolidColorBrush(color.Value))
             };
         }

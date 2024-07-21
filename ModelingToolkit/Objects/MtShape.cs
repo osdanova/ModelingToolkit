@@ -25,7 +25,8 @@ namespace ModelingToolkit.Objects
             box,
             column,
             sphere,
-            ellipsoid
+            ellipsoid,
+            boundingBox
         }
 
         public ModelVisual3D GetVisual()
@@ -50,7 +51,12 @@ namespace ModelingToolkit.Objects
             {
                 return Visuals.GetEllipsoidVisual(Position, Height, Width, Depth, ShapeColor);
             }
-            else throw new System.Exception("[MtShape.GetVisual] INVALID TYPE");
+            else if (Type == ShapeType.boundingBox)
+            {
+                return Visuals.GetBoundingBoxVisual(Position.X, Position.Y, Position.Z, Height, Width, Depth, ShapeColor);
+            }
+            else
+                throw new System.Exception("[MtShape.GetVisual] INVALID TYPE");
         }
 
         public static MtShape CreateCube(Vector3 position, float size)
@@ -104,6 +110,19 @@ namespace ModelingToolkit.Objects
         {
             MtShape shape = new MtShape();
             shape.Type = ShapeType.ellipsoid;
+            shape.Position = position;
+            shape.Height = height;
+            shape.Width = width;
+            shape.Depth = depth;
+            shape.IsVisible = true;
+
+            return shape;
+        }
+
+        public static MtShape CreateBoundingBox(Vector3 position, float height, float width, float depth)
+        {
+            MtShape shape = new MtShape();
+            shape.Type = ShapeType.boundingBox;
             shape.Position = position;
             shape.Height = height;
             shape.Width = width;
