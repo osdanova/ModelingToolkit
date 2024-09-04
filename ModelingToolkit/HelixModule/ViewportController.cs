@@ -1,5 +1,5 @@
 ﻿using HelixToolkit.Wpf;
-using ModelingToolkit.Objects;
+using ModelingToolkit.Core;
 using System.Collections.Generic;
 using System.Linq;
 using System.Windows.Media;
@@ -173,7 +173,7 @@ namespace ModelingToolkit.HelixModule
 
             if (loadBoundingBox)
             {
-                Rect3D boundingBox = model.GetBoundingBox();
+                Rect3D boundingBox = MtHelper.GetBoundingBox(model);
                 ModelVisual3D bb = Visuals.GetBoundingBoxVisual(boundingBox);
                 HelixUtils.ApplyRotationForViewport(bb);
                 ModelBoundingBox.Add(model, bb);
@@ -231,16 +231,19 @@ namespace ModelingToolkit.HelixModule
 
         public void AddShape(MtShape shape)
         {
-            if (ShapeVisuals.Keys.Contains(shape))
-            {
-                throw new System.Exception("Shape already exists in current Viewport");
-            }
+            // TODO
 
-            ShapeVisuals.Add(shape, shape.GetVisual());
-            if (shape.IsVisible)
-            {
-                Viewport.Children.Add(ShapeVisuals[shape]);
-            }
+
+            //if (ShapeVisuals.Keys.Contains(shape))
+            //{
+            //    throw new System.Exception("Shape already exists in current Viewport");
+            //}
+            //
+            //ShapeVisuals.Add(shape, shape.GetVisual());
+            //if (shape.IsVisible)
+            //{
+            //    Viewport.Children.Add(ShapeVisuals[shape]);
+            //}
         }
 
         public void RemoveShape(MtShape shape)
@@ -300,7 +303,7 @@ namespace ModelingToolkit.HelixModule
         {
             foreach (MtModel model in ModelVisuals.Keys)
             {
-                if (model.IsVisible)
+                if (MtHelper.MetadataIsTrue(model.Metadata, MtHelper.KEY_VISIBLE, true))
                 {
                     if (IsMeshVisible)
                     {
@@ -394,7 +397,7 @@ namespace ModelingToolkit.HelixModule
                     {
                         if (ModelBoundingBox[model] == null)
                         {
-                            Rect3D boundingBox = model.GetBoundingBox();
+                            Rect3D boundingBox = MtHelper.GetBoundingBox(model);
                             ModelVisual3D bb = Visuals.GetBoundingBoxVisual(boundingBox);
                             HelixUtils.ApplyRotationForViewport(bb);
                             ModelBoundingBox[model] = bb;
@@ -445,7 +448,7 @@ namespace ModelingToolkit.HelixModule
 
             foreach (MtShape shape in ShapeVisuals.Keys)
             {
-                if (shape.IsVisible)
+                if (MtHelper.MetadataIsTrue(shape.Metadata, MtHelper.KEY_VISIBLE))
                 {
                     if (!Viewport.Children.Contains(ShapeVisuals[shape]))
                     {
@@ -467,7 +470,7 @@ namespace ModelingToolkit.HelixModule
         {
             if (ModelVisuals.Count > 0 && ModelVisuals.Keys.ToArray()[0].Meshes.Count > 0)
             {
-                Rect3D boundingBox = ModelVisuals.Keys.ToArray()[0].GetBoundingBox();
+                Rect3D boundingBox = MtHelper.GetBoundingBox(ModelVisuals.Keys.ToArray()[0]);
                 double greatestSize = (boundingBox.SizeY > boundingBox.SizeZ) ? boundingBox.SizeY : boundingBox.SizeZ;
                 Viewport.CameraController.CameraPosition = new Point3D(boundingBox.X + greatestSize * 3, boundingBox.Z, boundingBox.Y);
                 Viewport.CameraController.CameraTarget = new Point3D(boundingBox.X, boundingBox.Z, boundingBox.Y);
@@ -511,7 +514,7 @@ namespace ModelingToolkit.HelixModule
             List<MtModel> searchResult = new List<MtModel>();
             foreach (MtModel model in ModelVisuals.Keys)
             {
-                foreach (string label in model.Labels)
+                foreach (string label in model.Metadata.Keys)
                 {
                     if (exactMatch)
                     {
@@ -566,7 +569,7 @@ namespace ModelingToolkit.HelixModule
             List<MtShape> searchResult = new List<MtShape>();
             foreach (MtShape shape in ShapeVisuals.Keys)
             {
-                foreach (string label in shape.Labels)
+                foreach (string label in shape.Metadata.Keys)
                 {
                     if (exactMatch)
                     {

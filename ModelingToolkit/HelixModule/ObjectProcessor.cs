@@ -1,5 +1,5 @@
 ﻿using HelixToolkit.Wpf;
-using ModelingToolkit.Objects;
+using ModelingToolkit.Core;
 using System;
 using System.Collections.Generic;
 using System.Numerics;
@@ -19,7 +19,7 @@ namespace ModelingToolkit.HelixModule
             {
                 MtMesh mesh = model.Meshes[i];
 
-                if (!mesh.IsVisible || !mesh.IsMeshVisible) {
+                if (!MtHelper.MetadataIsTrue(mesh.Metadata, MtHelper.KEY_VISIBLE, true)) {
                     continue;
                 }
 
@@ -76,7 +76,7 @@ namespace ModelingToolkit.HelixModule
                     {
                         myMaterial = new DiffuseMaterial
                         {
-                            Brush = new ImageBrush(model.Materials[mesh.MaterialId.Value].GetAsBitmapImage()),
+                            Brush = new ImageBrush(MtHelper.GetImageSourceFromMaterial(model.Materials[mesh.MaterialId.Value]))
                         };
                     }
                     else
@@ -111,7 +111,7 @@ namespace ModelingToolkit.HelixModule
             for(int i = 0; i < model.Meshes.Count; i++)
             {
                 MtMesh mesh = model.Meshes[i];
-                if (mesh.IsVisible && mesh.IsWireframeVisible)
+                if (MtHelper.MetadataIsTrue(mesh.Metadata, MtHelper.KEY_VISIBLE, true) && MtHelper.MetadataIsTrue(mesh.Metadata, MtHelper.KEY_WIREFRAME_VISIBLE))
                 {
                     wireframe.AddRange(GetWireframeFromMesh(mesh));
                 }
@@ -156,12 +156,12 @@ namespace ModelingToolkit.HelixModule
             for (int i = 0; i < model.Joints.Count; i++)
             {
                 MtJoint joint = model.Joints[i];
-                if (!joint.IsVisible || joint.ParentId == null) {
+                if (joint.ParentId == null) {
                     continue;
                 }
 
-                Vector3 translation = (Vector3)joint.AbsoluteTranslation;
-                Vector3 parentTranslation = (Vector3)model.Joints[(int)joint.ParentId].AbsoluteTranslation;
+                Vector3 translation = (Vector3)joint.AbsoluteTransform.Translation;
+                Vector3 parentTranslation = (Vector3)model.Joints[(int)joint.ParentId].AbsoluteTransform.Translation;
 
                 LinesVisual3D bone = Visuals.GetLineVisual(translation, parentTranslation, 2);
 
@@ -180,7 +180,7 @@ namespace ModelingToolkit.HelixModule
             {
                 MtJoint joint = model.Joints[i];
 
-                if (!joint.IsVisible) {
+                if (!MtHelper.MetadataIsTrue(joint.Metadata, MtHelper.KEY_VISIBLE, true)) {
                     continue;
                 }
 
@@ -193,7 +193,7 @@ namespace ModelingToolkit.HelixModule
 
 
                 BillboardVisual3D jointBB = new BillboardVisual3D();
-                jointBB.Position = new Point3D(joint.AbsoluteTranslation.Value.X, joint.AbsoluteTranslation.Value.Y, joint.AbsoluteTranslation.Value.Z);
+                jointBB.Position = new Point3D(joint.AbsoluteTransform.Translation.X, joint.AbsoluteTransform.Translation.Y, joint.AbsoluteTransform.Translation.Z);
                 jointBB.Width = 10;
                 jointBB.Height = 10;
                 jointBB.Material = new DiffuseMaterial(new SolidColorBrush(Colors.White));

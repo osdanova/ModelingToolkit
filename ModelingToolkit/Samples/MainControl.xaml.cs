@@ -1,6 +1,11 @@
-﻿using ModelingToolkit.AssimpModule;
+﻿using Assimp;
+using Microsoft.Win32;
+using ModelingToolkit.Core;
+using ModelingToolkit.Formats;
+using ModelingToolkit.Formats.MtAssimp;
 using ModelingToolkit.HelixModule;
-using ModelingToolkit.Objects;
+using System.Drawing.Imaging;
+using System.IO;
 using System.Linq;
 using System.Windows;
 using System.Windows.Controls;
@@ -11,7 +16,8 @@ namespace ModelingToolkit.Samples
     {
         public ViewportController VpController { get; set; }
         public string LoadedFile { get; set; }
-        public MtModel LoadedModel { get; set; }
+        public MtScene Scene { get; set; }
+
         public MainControl()
         {
             InitializeComponent();
@@ -35,10 +41,10 @@ namespace ModelingToolkit.Samples
 
         public void loadFile()
         {
-            LoadedModel = AssimpImporter.ImportScene(LoadedFile);
+            Scene = AssimpImporter.ImportScene(LoadedFile);
             VpController.ClearModels();
             VpController.ClearShapes();
-            VpController.AddModel(LoadedModel);
+            VpController.AddModel(Scene.Models[0].Model);
             VpController.Render();
         }
 
@@ -70,6 +76,60 @@ namespace ModelingToolkit.Samples
         private void Button_reload(object sender, RoutedEventArgs e)
         {
             loadFile();
+        }
+
+        private void MenuItem_ExportGltf(object sender, RoutedEventArgs e)
+        {
+            SaveFileDialog sfd;
+            sfd = new SaveFileDialog();
+            sfd.Title = "Export model";
+            sfd.FileName = Path.GetFileNameWithoutExtension(LoadedFile) + ".gltf";
+            if (sfd.ShowDialog() == true)
+            {
+                string dirPath = Path.GetDirectoryName(sfd.FileName);
+
+                if (!Directory.Exists(dirPath))
+                    return;
+                dirPath += "\\";
+
+                MtPorter.ExportScene(Scene, sfd.FileName, MtPorter.FileType.GLTF); //.SaveGLB(dirPath + sfd.FileName + ".glb");
+            }
+        }
+
+        private void MenuItem_ExportGlb(object sender, RoutedEventArgs e)
+        {
+            SaveFileDialog sfd;
+            sfd = new SaveFileDialog();
+            sfd.Title = "Export model";
+            sfd.FileName = Path.GetFileNameWithoutExtension(LoadedFile) + ".glb";
+            if (sfd.ShowDialog() == true)
+            {
+                string dirPath = Path.GetDirectoryName(sfd.FileName);
+
+                if (!Directory.Exists(dirPath))
+                    return;
+                dirPath += "\\";
+
+                MtPorter.ExportScene(Scene, sfd.FileName, MtPorter.FileType.GLB);
+            }
+        }
+
+        private void MenuItem_ExportFbx(object sender, RoutedEventArgs e)
+        {
+            SaveFileDialog sfd;
+            sfd = new SaveFileDialog();
+            sfd.Title = "Export model";
+            sfd.FileName = Path.GetFileNameWithoutExtension(LoadedFile) + ".fbx";
+            if (sfd.ShowDialog() == true)
+            {
+                string dirPath = Path.GetDirectoryName(sfd.FileName);
+
+                if (!Directory.Exists(dirPath))
+                    return;
+                dirPath += "\\";
+
+                MtPorter.ExportScene(Scene, sfd.FileName, MtPorter.FileType.FBX);
+            }
         }
     }
 }

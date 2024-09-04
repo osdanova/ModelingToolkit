@@ -1,0 +1,3 @@
+[submodule "ModelingToolkit.Formats"]
+	path = ModelingToolkit.Formats
+	url = https://github.com/osdanova/ModelingToolkit.Formats
